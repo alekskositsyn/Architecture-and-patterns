@@ -15,11 +15,17 @@ def secret_fc(request):
 
 
 def do_static(request):
+
     path = os.path.join('static', 'style.css')
     request['static'] = path
 
 
 def path_validator(path):
+    """
+    Добавляет в конце пути '/' при его отсутствии.
+    :param path: путь
+    :return:
+    """
     last_symbol = path[-1:]
     if last_symbol != '/':
         return path + '/'
