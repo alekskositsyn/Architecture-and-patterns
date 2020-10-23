@@ -1,7 +1,7 @@
-
-
 class Application:
-
+    """
+    Класс - приложение обработчик запросов клиента
+    """
     def __init__(self, ways, front_controllers, path_validator):
         self.ways = ways
         self.front_controllers = front_controllers

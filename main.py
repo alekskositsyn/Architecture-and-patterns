@@ -1,5 +1,4 @@
 import os
-
 import views
 from swallow.my_wsgi import Application
 

@@ -4,7 +4,7 @@ from jinja2 import Template
 
 def templates_engine(template_name, folder='templates', **kwargs):
     """
-    Шаблонизатор
+    Шаблонизатор - осуществляет рендер шаблонов.
     :param template_name: имя шаблона
     :param folder: папка с шаблонами
     :param kwargs: параметры для передачи в шаблон
