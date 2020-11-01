@@ -13,5 +13,12 @@ def products(request):
 
 
 def contacts(request):
-    secret = request.get('secret_key', None)
-    return '200 OK', templates_engine('contacts.html', secret=secret)
+    if request['method'] == 'POST':
+        data = request['data']
+        user_name = data['user_name']
+        text = data['text']
+        email = data['email']
+        with open('client_messages.txt', 'a') as f:
+            f.write(f'Пришло сообщение от {user_name} {email} c текстом: {text} \n')
+        return '200 OK', templates_engine('contacts.html')
+    return '200 OK', templates_engine('contacts.html')
