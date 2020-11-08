@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %} Contacts {% endblock %}
+{% block container %}
+    <h1> Здесь вы можете связаться с нами отправив сообщение </h1>
+    <form method="post">
+        <input type="text" name="user_name" placeholder="Ваше имя" >
+        <input type="text" name="text" placeholder="Текст сообщения" >
+        <input type="text" name="email" placeholder="email" >
+        <button type="submit">Отправить</button>
+        <button type="reset">Очистить</button>
+    </form>
+{% endblock %}
