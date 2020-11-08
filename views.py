@@ -4,7 +4,7 @@ from swallow.templator import templates_engine
 def index(request):
     secret = request.get('secret_key', None)
     static = request.get('static', None)
-    return '200 OK', templates_engine('index.html', secret=secret, static=static)
+    return '200 OK', templates_engine('index.html')
 
 
 def products(request):
