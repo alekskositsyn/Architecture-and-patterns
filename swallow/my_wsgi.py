@@ -3,6 +3,13 @@ class Application:
     Класс - приложение обработчик запросов клиента
     """
 
+    def add_urls(self, urls):
+        """ Декоратор """
+        def inner(view):
+            self.urls[urls] = view
+
+        return inner
+
     def create_data_dict(self, data: str):
         """ Функция создает словарь с данными. """
         result = {}
@@ -20,7 +27,7 @@ class Application:
         """
         result = {}
         if data:
-            data_str = data.decode()
+            data_str = data.decode(encoding='utf-8')
             result = self.create_data_dict(data_str)
         return result
 
@@ -31,8 +38,8 @@ class Application:
         data = env['wsgi.input'].read(content_length) if content_length > 0 else b''
         return data
 
-    def __init__(self, ways, front_controllers):
-        self.ways = ways
+    def __init__(self, urls, front_controllers):
+        self.urls = urls
         self.front_controllers = front_controllers
 
     def __call__(self, environ, first_response):
@@ -51,8 +58,8 @@ class Application:
         query_string = environ['QUERY_STRING']
         request_params = self.create_data_dict(query_string)
 
-        if path in self.ways:
-            view = self.ways[path]
+        if path in self.urls:
+            view = self.urls[path]
             request = {
                 'method': request_method,
                 'data': data,
