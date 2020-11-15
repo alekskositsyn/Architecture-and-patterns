@@ -7,7 +7,8 @@ class Logger(metaclass=SingletonByName):
         self.name = name
 
     def log(self, text):
-        print('log-->', text)
+        with open(f'{self.name}_logs.txt', 'a') as f:
+            f.write(f'{text}\n')
 
 
 # декоратор
