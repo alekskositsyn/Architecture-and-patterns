@@ -1,6 +1,6 @@
 import os
-from swallow.my_wsgi import Application
-from logging_model import Logger
+from swallow.my_wsgi import Application, DebugModeApplication
+from logging_model import Logger, debug
 from models import TrainingPage
 from swallow.templator import templates_engine
 
@@ -20,12 +20,14 @@ site = TrainingPage()
 logger = Logger('main')
 
 
+@debug
 def index(request):
     secret = request.get('secret_key', None)
     static = request.get('static', None)
     return '200 OK', templates_engine('index.html')
 
 
+@debug
 def create_category(request):
     if request['method'] == 'POST':
         # метод пост
@@ -49,6 +51,7 @@ def create_category(request):
         return '200 OK', templates_engine('create_category.html', groups=groups)
 
 
+@debug
 def create_group(request):
     if request['method'] == 'POST':
         # метод пост
@@ -73,6 +76,7 @@ def create_group(request):
         return '200 OK', templates_engine('create_group.html', groups=groups)
 
 
+@debug
 def add_user(request):
     if request['method'] == 'POST':
         data = request['data']
@@ -102,10 +106,12 @@ urls = {
     '/create-category/': create_category,
     '/add-user/': add_user
 }
-application = Application(urls, front_controllers)
+# application = Application(urls, front_controllers)
+application = DebugModeApplication(urls, front_controllers)
 
 
 @application.add_urls('/copy-group/')
+@debug
 def copy_group(request):
     request_params = request['request_params']
     print(request_params)
@@ -120,12 +126,14 @@ def copy_group(request):
 
 
 @application.add_urls('/category-list/')
+@debug
 def category_list(request):
     logger.log('List categories')
     return '200 OK', templates_engine('category_list.html', objects_list=site.categories)
 
 
 @application.add_urls('/group-list/')
+@debug
 def group_list(request):
     logger.log('List groups')
     return '200 OK', templates_engine('group_list.html', objects_list=site.groups)

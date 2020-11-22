@@ -4,7 +4,8 @@ class Application:
     """
 
     def add_urls(self, urls):
-        """ Декоратор """
+        """ Декоратор (структурный патерн) """
+
         def inner(view):
             self.urls[urls] = view
 
@@ -74,3 +75,25 @@ class Application:
         else:
             first_response('404 Not Found', [('Content-Type', 'text/html')])
             return [b'Not Found']
+
+
+class DebugModeApplication(Application):
+    def __init__(self, urls, front_controllers):
+        self.application = Application(urls, front_controllers)
+        super().__init__(urls, front_controllers)
+
+    def __call__(self, environ, first_response):
+        print('DEBUG MODE')
+        # print(environ)
+        return super().__call__(environ, first_response)
+        # return self.application(environ, first_response)
+
+
+
+    def add_urls(self, urls):
+        """ Декоратор (структурный патерн) """
+
+        def inner(view):
+            self.urls[urls] = view
+
+        return inner
