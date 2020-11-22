@@ -1,5 +1,5 @@
 import os
-from swallow.my_wsgi import Application, DebugModeApplication
+from swallow.my_wsgi import Application, DebugModeApplication, FakeApplication
 from logging_model import Logger, debug
 from models import TrainingPage
 from swallow.templator import templates_engine
@@ -107,7 +107,8 @@ urls = {
     '/add-user/': add_user
 }
 # application = Application(urls, front_controllers)
-application = DebugModeApplication(urls, front_controllers)
+# application = DebugModeApplication(urls, front_controllers)
+application = FakeApplication(urls, front_controllers)
 
 
 @application.add_urls('/copy-group/')

@@ -85,15 +85,18 @@ class DebugModeApplication(Application):
     def __call__(self, environ, first_response):
         print('DEBUG MODE')
         # print(environ)
+        print(f"REQUEST METHOD: {environ['REQUEST_METHOD']}\n"
+              f"QUERY_STRING: {environ['QUERY_STRING']}"
+              )
         return super().__call__(environ, first_response)
         # return self.application(environ, first_response)
 
 
+class FakeApplication(Application):
+    def __init__(self, urls, front_controllers):
+        self.application = Application(urls, front_controllers)
+        super().__init__(urls, front_controllers)
 
-    def add_urls(self, urls):
-        """ Декоратор (структурный патерн) """
-
-        def inner(view):
-            self.urls[urls] = view
-
-        return inner
+    def __call__(self, environ, first_response):
+        first_response('200 OK', [('Content-Type', 'text/html')])
+        return [b'<h1>Hello from FAKE!</h1>']
