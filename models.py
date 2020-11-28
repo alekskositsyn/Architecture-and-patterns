@@ -1,4 +1,3 @@
-import abc
 from reusepatterns.prototypes import PrototypeMixin
 
 
@@ -14,10 +13,16 @@ class Sportsman(User):
     pass
 
 
-class UserCreate:
+class SimpleFactory:
+    # Фабричный метод
+    def __init__(self, types=None):
+        self.types = types or {}
+
+
+class UserFactory:
     types = {
-        'trainer': Trainer,
-        'sportsman': Sportsman
+        'sportsman': Sportsman,
+        'trainer': Trainer
     }
 
     @classmethod
@@ -34,44 +39,35 @@ class Category:
         Category.auto_id += 1
         self.name = name
         self.category = category
-        self.courses = []
+        self.groups = []
 
-    def course_count(self):
-        result = len(self.courses)
+    def group_count(self):
+        result = len(self.groups)
         if self.category:
-            result += self.category.course_count()
+            result += self.category.group_count()
         return result
 
 
 class Group(PrototypeMixin):
-    """ Класс для копирования групп """
+
     def __init__(self, name, category):
         self.name = name
         self.category = category
         self.category.groups.append(self)
 
 
-class Start(Group):
+class InteractiveCourse(Group):
     pass
 
 
-class Medium(Group):
-    pass
-
-
-class Professional(Group):
+class RecordCourse(Group):
     pass
 
 
 class GroupFactory:
-    """
-    Класс фабрика групп начальной,
-    средней и профессиональной подготовки
-    """
     types = {
-        'start': Start,
-        'medium': Medium,
-        'professional': Professional,
+        'interactive': InteractiveCourse,
+        'record': RecordCourse
     }
 
     @classmethod
@@ -82,13 +78,13 @@ class GroupFactory:
 class TrainingPage:
     # Интерфейс
     def __init__(self):
-        self.trainers = []
-        self.sportsman = []
+        self.teachers = []
+        self.students = []
         self.groups = []
         self.categories = []
 
     def create_user(self, type_):
-        return UserCreate.create(type_)
+        return UserFactory.create(type_)
 
     def create_category(self, name, category=None):
         return Category(name, category)
@@ -107,7 +103,7 @@ class TrainingPage:
     #             return item
     #     return self.create_category(name)
 
-    def create_group(self, type_, name, category):
+    def create_groupe(self, type_, name, category):
         return GroupFactory.create(type_, name, category)
 
     def get_group(self, name) -> Group:
