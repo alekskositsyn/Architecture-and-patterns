@@ -1,8 +1,9 @@
 import os
 from swallow.my_wsgi import Application, DebugModeApplication, FakeApplication
 from logging_model import Logger, debug
-from models import TrainingPage
+from models import TrainingPage, BaseSerializer
 from swallow.templator import templates_engine
+from swallow.swallow_cbv import ListView, CreateView
 
 
 # Fronts Controllers
@@ -40,23 +41,27 @@ def create_group(request):
         if category_id:
             category = site.find_category_by_id(int(category_id))
 
-            course = site.create_groupe('start', name, category)
+            course = site.create_group('start', name, category)
             site.groups.append(course)
         # редирект?
-        return '302 Moved Temporarily', templates_engine('group_list.html')
+        # return '302 Moved Temporarily', templates_engine('group_list.html')
         # Для начала можно без него
-        # return '200 OK', templates_engine('create_group.html')
+        return '200 OK', templates_engine('create_group.html')
     else:
-        groups = site.groups
-        # categories = site.categories
-        return '200 OK', templates_engine('create_group.html', categories=groups)
+        # groups = site.groups
+        categories = site.categories
+        return '200 OK', templates_engine('create_group.html', categories=categories)
 
 
-def create_category(request):
-    if request['method'] == 'POST':
-        # метод пост
-        data = request['data']
-        # print(data)
+class CategoryCreateView(CreateView):
+    template_name = 'create_category.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['categories'] = site.categories
+        return context
+
+    def create_obj(self, data: dict):
         name = data['name']
         category_id = data.get('category_id')
 
@@ -66,45 +71,99 @@ def create_category(request):
 
         new_category = site.create_category(name, category)
         site.categories.append(new_category)
-        # редирект?
-        return '302 Moved Temporarily', templates_engine('create_group.html')
-        # Для начала можно без него
-        # return '200 OK', templates_engine('create_category.html')
-    else:
-        categories = site.categories
-        return '200 OK', templates_engine('create_category.html', categories=categories)
 
 
-@debug
-def add_user(request):
-    if request['method'] == 'POST':
-        data = request['data']
-        print(data)
-        user_type = data['user_type']
-        first_name = data['first_name']
-        second_name = data['second_name']
-        age = data['age']
-        email = data['email']
-        phone = data['phone']
-        print(user_type)
-        with open('base_client.txt', 'a') as f:
-            f.write(f'Запись в группу {user_type} '
-                    f'{first_name} '
-                    f'{second_name}  '
-                    f'{second_name} '
-                    f'{email} '
-                    f'{age} '
-                    f'{phone} \n')
-        return '200 OK', templates_engine('add_user.html')
-    return '200 OK', templates_engine('add_user.html')
+# def create_category(request):
+#     if request['method'] == 'POST':
+#         # метод пост
+#         data = request['data']
+#         # print(data)
+#         name = data['name']
+#         category_id = data.get('category_id')
+#
+#         category = None
+#         if category_id:
+#             category = site.find_category_by_id(int(category_id))
+#
+#         new_category = site.create_category(name, category)
+#         site.categories.append(new_category)
+#         # редирект?
+#         return '302 Moved Temporarily', templates_engine('create_group.html')
+#         # Для начала можно без него
+#         # return '200 OK', templates_engine('create_category.html')
+#     else:
+#         categories = site.categories
+#         return '200 OK', templates_engine('create_category.html', categories=categories)
+class CategoryListView(ListView):
+    queryset = site.categories
+    template_name = 'category_list.html'
+
+
+class SportsmanListView(ListView):
+    queryset = site.sportsman
+    template_name = 'sportsman_list.html'
+
+
+class SportsmanCreateView(CreateView):
+    template_name = 'create_sportsman.html'
+
+    def create_obj(self, data: dict):
+        name = data['name']
+        new_obj = site.create_user('sportsman', name)
+        site.sportsman.append(new_obj)
+
+
+class AddSportsmanByGroupCreateView(CreateView):
+    template_name = 'add_sportsman.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['groups'] = site.groups
+        context['sportsman'] = site.sportsman
+        return context
+
+    def create_obj(self, data: dict):
+        group_name = data['group_name']
+        group = site.get_group(group_name)
+        sportsman_name = data['sportsman_name']
+        sportsman = site.get_student(sportsman_name)
+        group.add_student(sportsman)
+
+
+# @debug
+# def add_user(request):
+#     if request['method'] == 'POST':
+#         data = request['data']
+#         print(data)
+#         user_type = data['user_type']
+#         first_name = data['first_name']
+#         second_name = data['second_name']
+#         age = data['age']
+#         email = data['email']
+#         phone = data['phone']
+#         print(user_type)
+#         with open('base_client.txt', 'a') as f:
+#             f.write(f'Запись в группу {user_type} '
+#                     f'{first_name} '
+#                     f'{second_name}  '
+#                     f'{second_name} '
+#                     f'{email} '
+#                     f'{age} '
+#                     f'{phone} \n')
+#         return '200 OK', templates_engine('add_user.html')
+#     return '200 OK', templates_engine('add_user.html')
 
 
 urls = {
     '/': index,
     '/create-group/': create_group,
-    '/create-category/': create_category,
-    '/add-user/': add_user
+    '/create-category/': CategoryCreateView(),
+    '/category-list/': CategoryListView(),
+    '/sportsman-list/': SportsmanListView(),
+    '/create-sportsman/': SportsmanCreateView(),
+    '/add-sportsman/': AddSportsmanByGroupCreateView(),
 }
+
 # application = Application(urls, front_controllers)
 application = DebugModeApplication(urls, front_controllers)
 
@@ -125,18 +184,23 @@ def copy_course(request):
         new_group.name = new_name
         site.groups.append(new_group)
 
-    return '200 OK', templates_engine('group_list.html', objects_list=site.categories)
+    return '200 OK', templates_engine('group_list.html', objects_list=site.groups)
 
 
-@application.add_urls('/category-list/')
-@debug
-def category_list(request):
-    logger.log('List categories')
-    return '200 OK', templates_engine('category_list.html', objects_list=site.categories)
-
-
+# @application.add_urls('/category-list/')
+# @debug
+# def category_list(request):
+#     logger.log('List categories')
+#     return '200 OK', templates_engine('category_list.html', objects_list=site.categories)
+#
+#
 @application.add_urls('/group-list/')
 @debug
 def group_list(request):
     logger.log('List groups')
     return '200 OK', templates_engine('group_list.html', objects_list=site.categories)
+
+
+@application.add_urls('/api/')
+def course_api(request):
+    return '200 OK', BaseSerializer(site.groups).save()

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}
+Список студентов
+{% endblock %}
+{% block container %}
+<h1>Список студентов</h1>
+<ul>
+
+    {% for item in objects_list %}
+    <li>
+        {{item.name}}
+        {% for group in item.groups %}
+            {{group.name}}
+        {% endfor %}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
