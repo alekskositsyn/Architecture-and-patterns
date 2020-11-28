@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}
+    Создание курса
+{% endblock %}
+{% block container %}
+    <h1>Добавление спортсмена в группу</h1>
+    <form method="post">
+        <select size="3" name="group_name">
+            {% for item in groups %}
+                <option value="{{ item.name }}">{{ item.name }}</option>
+            {% endfor %}
+        </select>
+        <select size="3" name="sportsman_name">
+            {% for item in sportsman %}
+                <option value="{{ item.name }}">{{ item.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Записать</button>
+    </form>
+{% endblock %}
