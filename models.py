@@ -56,18 +56,23 @@ class Group(PrototypeMixin):
         self.category.groups.append(self)
 
 
-class InteractiveCourse(Group):
+class StartGroup(Group):
     pass
 
 
-class RecordCourse(Group):
+class MediumGroup(Group):
+    pass
+
+
+class ProGroup(Group):
     pass
 
 
 class GroupFactory:
     types = {
-        'interactive': InteractiveCourse,
-        'record': RecordCourse
+        'start': StartGroup,
+        'medium': MediumGroup,
+        'pro': ProGroup
     }
 
     @classmethod

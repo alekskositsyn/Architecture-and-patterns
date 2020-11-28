@@ -5,7 +5,7 @@
     <ul>
         {% for item in objects_list %}
             <li>
-                {{ item.name }} <span>Количество групп: {{ item.group_count() }}</span>
+                {{ item.name }} {{ item }}<span>Количество групп: {{ item.group_count() }}</span>
 
             </li>
         {% endfor %}

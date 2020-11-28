@@ -33,21 +33,23 @@ def create_group(request):
         # метод пост
         data = request['data']
         name = data['name']
+        # group_type = data['group_type']
         category_id = data.get('category_id')
         print(category_id)
         category = None
         if category_id:
             category = site.find_category_by_id(int(category_id))
 
-            course = site.create_groupe('record', name, category)
+            course = site.create_groupe('start', name, category)
             site.groups.append(course)
         # редирект?
         return '302 Moved Temporarily', templates_engine('group_list.html')
         # Для начала можно без него
         # return '200 OK', templates_engine('create_group.html')
     else:
-        categories = site.categories
-        return '200 OK', templates_engine('create_group.html', categories=categories)
+        groups = site.groups
+        # categories = site.categories
+        return '200 OK', templates_engine('create_group.html', categories=groups)
 
 
 def create_category(request):
@@ -71,7 +73,6 @@ def create_category(request):
     else:
         categories = site.categories
         return '200 OK', templates_engine('create_category.html', categories=categories)
-
 
 
 @debug
@@ -106,6 +107,8 @@ urls = {
 }
 # application = Application(urls, front_controllers)
 application = DebugModeApplication(urls, front_controllers)
+
+
 # application = FakeApplication(urls, front_controllers)
 
 
@@ -113,7 +116,7 @@ application = DebugModeApplication(urls, front_controllers)
 @debug
 def copy_course(request):
     request_params = request['request_params']
-    # print(request_params)
+    print(request_params)
     name = request_params['name']
     old_group = site.get_group(name)
     if old_group:
