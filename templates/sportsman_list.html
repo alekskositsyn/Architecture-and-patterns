@@ -3,12 +3,12 @@
 Список студентов
 {% endblock %}
 {% block container %}
-<h1>Список студентов</h1>
+<h1>Список спортсменов</h1>
 <ul>
 
     {% for item in objects_list %}
     <li>
-        {{item.name}}
+        {{item.firstname}} {{item.lastname}}
         {% for group in item.groups %}
             {{group.name}}
         {% endfor %}

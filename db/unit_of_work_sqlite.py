@@ -211,17 +211,17 @@ try:
 
     new_category = Category(None, 'Pistol')
     new_category.mark_new()
-    person_mapper = PersonMapper(connection)
-    exists_person_1 = person_mapper.find_by_id(1)
-    exists_person_1.mark_dirty()
-    print(exists_person_1.first_name)
-    exists_person_1.first_name += ' Senior'
-    print(exists_person_1.first_name)
-
-    exists_person_2 = person_mapper.find_by_id(2)
-    exists_person_2.mark_removed()
-
-    print(UnitOfWork.get_current().__dict__)
+    # person_mapper = PersonMapper(connection)
+    # exists_person_1 = person_mapper.find_by_id(1)
+    # exists_person_1.mark_dirty()
+    # print(exists_person_1.first_name)
+    # exists_person_1.first_name += ' Senior'
+    # print(exists_person_1.first_name)
+    #
+    # exists_person_2 = person_mapper.find_by_id(2)
+    # exists_person_2.mark_removed()
+    #
+    # print(UnitOfWork.get_current().__dict__)
 
     UnitOfWork.get_current().commit()
 except Exception as e:

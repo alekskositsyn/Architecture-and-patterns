@@ -1,0 +1,20 @@
+PRAGMA foreign_keys = off;
+BEGIN TRANSACTION;
+
+DROP TABLE IF EXISTS sportsman;
+CREATE TABLE sportsman
+(
+    id         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
+    firstname  VARCHAR(32),
+    lastname VARCHAR(32)
+);
+DROP TABLE IF EXISTS category;
+CREATE TABLE category
+(
+    id         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
+    name  VARCHAR(32)
+);
+
+
+COMMIT TRANSACTION;
+PRAGMA foreign_keys = on;

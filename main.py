@@ -1,12 +1,16 @@
 import os
+
+from mappers import MapperRegistry
 from swallow.my_wsgi import Application, DebugModeApplication, FakeApplication
 from logging_model import Logger, debug
-from models import TrainingPage, BaseSerializer
+from models import TrainingPage, BaseSerializer, EmailNotifier, SmsNotifier
 from swallow.templator import templates_engine
 from swallow.swallow_cbv import ListView, CreateView
 
-
 # Fronts Controllers
+from swallow_orm.unitofwork import UnitOfWork
+
+
 def secret_fc(request):
     request['secret_key'] = 'some secret'
 
@@ -19,6 +23,10 @@ def do_static(request):
 front_controllers = [secret_fc, do_static]
 site = TrainingPage()
 logger = Logger('main')
+email_notifier = EmailNotifier()
+sms_notifier = SmsNotifier()
+UnitOfWork.new_current()
+UnitOfWork.get_current().set_mapper_registry(MapperRegistry)
 
 
 @debug
@@ -100,17 +108,24 @@ class CategoryListView(ListView):
 
 
 class SportsmanListView(ListView):
-    queryset = site.sportsman
+    # queryset = site.sportsman
     template_name = 'sportsman_list.html'
+
+    def get_queryset(self):
+        mapper = MapperRegistry.get_current_mapper('sportsman')
+        return mapper.all()
 
 
 class SportsmanCreateView(CreateView):
     template_name = 'create_sportsman.html'
 
     def create_obj(self, data: dict):
-        name = data['name']
-        new_obj = site.create_user('sportsman', name)
+        firstname = data['firstname']
+        lastname = data['lastname']
+        new_obj = site.create_user('sportsman', firstname, lastname)
         site.sportsman.append(new_obj)
+        new_obj.mark_new()
+        UnitOfWork.get_current().commit()
 
 
 class AddSportsmanByGroupCreateView(CreateView):
@@ -127,7 +142,7 @@ class AddSportsmanByGroupCreateView(CreateView):
         group = site.get_group(group_name)
         sportsman_name = data['sportsman_name']
         sportsman = site.get_student(sportsman_name)
-        group.add_student(sportsman)
+        group.add_sportsman(sportsman)
 
 
 # @debug
@@ -175,7 +190,7 @@ application = DebugModeApplication(urls, front_controllers)
 @debug
 def copy_course(request):
     request_params = request['request_params']
-    print(request_params)
+    # print(request_params)
     name = request_params['name']
     old_group = site.get_group(name)
     if old_group:

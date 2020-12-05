@@ -2,27 +2,23 @@ import jsonpickle
 
 from reusepatterns.prototypes import PrototypeMixin
 from reusepatterns.observer import Subject, Observer
+from swallow_orm.unitofwork import DomainObject
 
 
 class User:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, firstname, lastname):
+        self.firstname = firstname
+        self.lastname = lastname
 
 
 class Trainer(User):
     pass
 
 
-class Sportsman(User):
-    def __init__(self, name):
-        self.courses = []
-        super().__init__(name)
-
-
-class SimpleFactory:
-    # Фабричный метод
-    def __init__(self, types=None):
-        self.types = types or {}
+class Sportsman(User, DomainObject):
+    def __init__(self, firstname, lastname):
+        self.groups = []
+        super().__init__(firstname, lastname)
 
 
 class UserFactory:
@@ -32,8 +28,8 @@ class UserFactory:
     }
 
     @classmethod
-    def create(cls, type_, name):
-        return cls.types[type_](name)
+    def create(cls, type_, firstname, lastname):
+        return cls.types[type_](firstname, lastname)
 
 
 class Category:
@@ -68,9 +64,9 @@ class Group(PrototypeMixin, Subject):
     def __getitem__(self, item):
         return self.sportsman[item]
 
-    def add_student(self, sportsman: Sportsman):
+    def add_sportsman(self, sportsman: Sportsman):
         self.sportsman.append(sportsman)
-        sportsman.courses.append(self)
+        sportsman.groups.append(self)
         self.notify()
 
 
@@ -130,8 +126,8 @@ class TrainingPage:
         self.groups = []
         self.categories = []
 
-    def create_user(self, type_, name):
-        return UserFactory.create(type_, name)
+    def create_user(self, type_, firstname, lastname):
+        return UserFactory.create(type_, firstname, lastname)
 
     def create_category(self, name, category=None):
         return Category(name, category)
@@ -157,7 +153,7 @@ class TrainingPage:
         for item in self.groups:
             if item.name == name:
                 return item
-        return None
+
 
     def get_student(self, name) -> Sportsman:
         for item in self.sportsman:
