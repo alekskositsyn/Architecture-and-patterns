@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Список групп{% endblock %}
+{% block container %}
+    <h1>Список групп</h1>
+    <ul>
+        {% for item in objects_list %}
+            <li>
+                {{ item.name }} <span><a href="/copy-group/?name={{ item.name }}">скопировать</a></span>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
