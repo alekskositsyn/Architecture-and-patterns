@@ -1,5 +1,5 @@
 import sqlite3
-from models import Sportsman, Category
+from models import Sportsman, Category, Group
 
 connection = sqlite3.connect('swallow.sqlite')
 
@@ -142,14 +142,14 @@ class GroupMapper:
         result = []
         for item in self.cursor.fetchall():
             id, name = item
-            category = Category(id, name)
-            category.id, category.name = id, name
-            result.append(category)
+            group = Group(id, name)
+            group.id, group.name = id, name
+            result.append(group)
         return result
 
     def find_by_id(self, id_groups):
         statement = f"SELECT NAME \
-                         FROM CATEGORY WHERE ID='{id_groups}'"
+                         FROM GROUPS WHERE ID='{id_groups}'"
         self.cursor.execute(statement)
         result = self.cursor.fetchall()
         if result:
@@ -158,7 +158,7 @@ class GroupMapper:
             raise RecordNotFoundException(f'record with id={id_groups} not found')
 
     def insert(self, groups):
-        statement = f"INSERT INTO CATEGORY (NAME) VALUES \
+        statement = f"INSERT INTO GROUPS (NAME) VALUES \
                          ('{groups.name}')"
         self.cursor.execute(statement)
         try:
@@ -167,7 +167,7 @@ class GroupMapper:
             raise DbCommitException(e.args)
 
     def update(self, groups):
-        statement = f"UPDATE CATEGORY SET NAME='{groups.name}' \
+        statement = f"UPDATE GROUPS SET NAME='{groups.name}' \
                          WHERE ID='{groups.id_groups}'"
         self.cursor.execute(statement)
         try:
@@ -176,7 +176,7 @@ class GroupMapper:
             raise DbUpdateException(e.args)
 
     def delete(self, groups):
-        statement = f"DELETE FROM CATEGORY WHERE ID='{groups.id_groups}'"
+        statement = f"DELETE FROM GROUP WHERE ID='{groups.id_groups}'"
         self.cursor.execute(statement)
         try:
             self.connection.commit()

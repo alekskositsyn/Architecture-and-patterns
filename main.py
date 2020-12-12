@@ -41,12 +41,12 @@ class GroupCreateView(CreateView):
 
     def create_obj(self, data: dict):
         type_ = data['group_type']
-        category_id = data.get('category_id')
-        category = None
-        if category_id:
-            category = site.find_category_by_id(int(category_id))
+        # category_id = data.get('category_id')
+        # category = None
+        # if category_id:
+        #     category = site.find_category_by_id(int(category_id))
 
-        new_group = site.create_group(type_, category)
+        new_group = site.create_group(type_)
         site.categories.append(new_group)
         new_group.mark_new()
         UnitOfWork.get_current().commit()

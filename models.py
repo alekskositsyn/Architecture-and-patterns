@@ -53,36 +53,36 @@ class Category(DomainObject):
     #     return result
 
 
-class Group(PrototypeMixin, Subject):
-    def __init__(self, name, category):
+class Group(PrototypeMixin, Subject, DomainObject):
+    def __init__(self, name):
         self.name = name
-        self.category = category
-        self.category.groups.append(self)
-        self.sportsman = []
+        # self.category = category
+        # self.category.groups.append(self)
+        # self.sportsman = []
         super().__init__()
+    #
+    # def __getitem__(self, item):
+    #     return self.sportsman[item]
+    #
+    # def add_sportsman(self, sportsman: Sportsman):
+    #     self.sportsman.append(sportsman)
+    #     sportsman.groups.append(self)
+    #     self.notify()
 
-    def __getitem__(self, item):
-        return self.sportsman[item]
 
-    def add_sportsman(self, sportsman: Sportsman):
-        self.sportsman.append(sportsman)
-        sportsman.groups.append(self)
-        self.notify()
-
-
-class StartGroup(Group, DomainObject):
+class StartGroup(Group):
     def __init__(self, name):
         self.name = 'Start Group'
         super().__init__(name)
 
 
-class MediumGroup(Group, DomainObject):
+class MediumGroup(Group):
     def __init__(self, name):
         self.name = 'Medium Group'
         super().__init__(name)
 
 
-class ProGroup(Group, DomainObject):
+class ProGroup(Group):
     def __init__(self, name):
         self.name = 'Pro Group'
         super().__init__(name)
@@ -96,8 +96,8 @@ class GroupFactory:
     }
 
     @classmethod
-    def create(cls, type_, category):
-        return cls.types[type_](category)
+    def create(cls, type_):
+        return cls.types[type_](type_)
 
 
 class SmsNotifier(Observer):
@@ -152,8 +152,8 @@ class TrainingPage:
     #             return item
     #     return self.create_category(name)
 
-    def create_group(self, type_, category):
-        return GroupFactory.create(type_, category)
+    def create_group(self, type_):
+        return GroupFactory.create(type_)
 
     def get_group(self, name) -> Group:
         for item in self.groups:
