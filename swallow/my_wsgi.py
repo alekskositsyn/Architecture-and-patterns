@@ -85,9 +85,7 @@ class DebugModeApplication(Application):
     def __call__(self, environ, first_response):
         print('DEBUG MODE')
         # print(environ)
-        print(f"REQUEST METHOD: {environ['REQUEST_METHOD']}\n"
-              f"QUERY_STRING: {environ['QUERY_STRING']}"
-              )
+        print(f"REQUEST METHOD: {environ['REQUEST_METHOD']}")
         return super().__call__(environ, first_response)
         # return self.application(environ, first_response)
 

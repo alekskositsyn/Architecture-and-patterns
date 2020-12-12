@@ -36,29 +36,45 @@ def index(request):
     return '200 OK', templates_engine('index.html')
 
 
-@debug
-def create_group(request):
-    if request['method'] == 'POST':
-        # метод пост
-        data = request['data']
-        name = data['name']
-        # group_type = data['group_type']
+class GroupCreateView(CreateView):
+    template_name = 'create_group.html'
+
+    def create_obj(self, data: dict):
+        type_ = data['group_type']
         category_id = data.get('category_id')
-        print(category_id)
         category = None
         if category_id:
             category = site.find_category_by_id(int(category_id))
 
-            course = site.create_group('start', name, category)
-            site.groups.append(course)
-        # редирект?
-        # return '302 Moved Temporarily', templates_engine('group_list.html')
-        # Для начала можно без него
-        return '200 OK', templates_engine('create_group.html')
-    else:
-        # groups = site.groups
-        categories = site.categories
-        return '200 OK', templates_engine('create_group.html', categories=categories)
+        new_group = site.create_group(type_, category)
+        site.categories.append(new_group)
+        new_group.mark_new()
+        UnitOfWork.get_current().commit()
+
+
+# @debug
+# def create_group(request):
+#     if request['method'] == 'POST':
+#         # метод пост
+#         data = request['data']
+#         name = data['name']
+#         # group_type = data['group_type']
+#         category_id = data.get('category_id')
+#         print(category_id)
+#         category = None
+#         if category_id:
+#             category = site.find_category_by_id(int(category_id))
+#
+#             course = site.create_group('start', name, category)
+#             site.groups.append(course)
+#         # редирект?
+#         # return '302 Moved Temporarily', templates_engine('group_list.html')
+#         # Для начала можно без него
+#         return '200 OK', templates_engine('create_group.html')
+#     else:
+#         # groups = site.groups
+#         categories = site.categories
+#         return '200 OK', templates_engine('create_group.html', categories=categories)
 
 
 class CategoryCreateView(CreateView):
@@ -66,19 +82,20 @@ class CategoryCreateView(CreateView):
 
     def get_context_data(self):
         context = super().get_context_data()
-        context['categories'] = site.categories
+        context['groups'] = site.groups
         return context
 
     def create_obj(self, data: dict):
         name = data['name']
-        category_id = data.get('category_id')
+        # category_id = data.get('category_id')
+        # category = None
+        # if category_id:
+        #     category = site.find_category_by_id(int(category_id))
 
-        category = None
-        if category_id:
-            category = site.find_category_by_id(int(category_id))
-
-        new_category = site.create_category(name, category)
+        new_category = site.create_category(name)
         site.categories.append(new_category)
+        new_category.mark_new()
+        UnitOfWork.get_current().commit()
 
 
 # def create_category(request):
@@ -103,8 +120,12 @@ class CategoryCreateView(CreateView):
 #         categories = site.categories
 #         return '200 OK', templates_engine('create_category.html', categories=categories)
 class CategoryListView(ListView):
-    queryset = site.categories
+    # queryset = site.categories
     template_name = 'category_list.html'
+
+    def get_queryset(self):
+        mapper = MapperRegistry.get_current_mapper('category')
+        return mapper.all()
 
 
 class SportsmanListView(ListView):
@@ -123,7 +144,6 @@ class SportsmanCreateView(CreateView):
         firstname = data['firstname']
         lastname = data['lastname']
         new_obj = site.create_user('sportsman', firstname, lastname)
-        site.sportsman.append(new_obj)
         new_obj.mark_new()
         UnitOfWork.get_current().commit()
 
@@ -171,7 +191,7 @@ class AddSportsmanByGroupCreateView(CreateView):
 
 urls = {
     '/': index,
-    '/create-group/': create_group,
+    '/create-group/': GroupCreateView(),
     '/create-category/': CategoryCreateView(),
     '/category-list/': CategoryListView(),
     '/sportsman-list/': SportsmanListView(),

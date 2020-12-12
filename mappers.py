@@ -1,5 +1,5 @@
 import sqlite3
-from models import Sportsman
+from models import Sportsman, Category
 
 connection = sqlite3.connect('swallow.sqlite')
 
@@ -52,7 +52,8 @@ class SportsmanMapper:
             raise RecordNotFoundException(f'record with id={id} not found')
 
     def insert(self, obj):
-        statement = f"INSERT INTO {self.table_name} (firstname, lastname) VALUES ('{obj.firstname}', '{obj.lastname}')"
+        statement = f"INSERT INTO {self.table_name} (firstname, lastname) VALUES \
+        ('{obj.firstname}', '{obj.lastname}')"
         self.cursor.execute(statement)
         try:
             self.connection.commit()
@@ -77,15 +78,127 @@ class SportsmanMapper:
             raise DbDeleteException(e.args)
 
 
+class CategoryMapper:
+    def __init__(self, connection):
+        self.connection = connection
+        self.cursor = connection.cursor()
+
+    def all(self):
+        statement = f'SELECT * from {"category"}'
+        self.cursor.execute(statement)
+        result = []
+        for item in self.cursor.fetchall():
+            id, name = item
+            category = Category(name)
+            category.id = id
+            result.append(category)
+        return result
+
+    def find_by_id(self, id_category):
+        statement = f"SELECT NAME \
+                         FROM CATEGORY WHERE ID='{id_category}'"
+        self.cursor.execute(statement)
+        result = self.cursor.fetchall()
+        if result:
+            return Category(*result[0])
+        else:
+            raise RecordNotFoundException(f'record with id={id_category} not found')
+
+    def insert(self, category):
+        statement = f"INSERT INTO CATEGORY (NAME) VALUES \
+                         ('{category.name}')"
+        self.cursor.execute(statement)
+        try:
+            self.connection.commit()
+        except Exception as e:
+            raise DbCommitException(e.args)
+
+    def update(self, category):
+        statement = f"UPDATE CATEGORY SET NAME='{category.name}' \
+                         WHERE ID='{category.id_category}'"
+        self.cursor.execute(statement)
+        try:
+            self.connection.commit()
+        except Exception as e:
+            raise DbUpdateException(e.args)
+
+    def delete(self, category):
+        statement = f"DELETE FROM CATEGORY WHERE ID='{category.id_category}'"
+        self.cursor.execute(statement)
+        try:
+            self.connection.commit()
+        except Exception as e:
+            raise DbDeleteException(e.args)
+
+
+class GroupMapper:
+    def __init__(self, connection):
+        self.connection = connection
+        self.cursor = connection.cursor()
+
+    def all(self):
+        statement = f'SELECT * from {"groups"}'
+        self.cursor.execute(statement)
+        result = []
+        for item in self.cursor.fetchall():
+            id, name = item
+            category = Category(id, name)
+            category.id, category.name = id, name
+            result.append(category)
+        return result
+
+    def find_by_id(self, id_groups):
+        statement = f"SELECT NAME \
+                         FROM CATEGORY WHERE ID='{id_groups}'"
+        self.cursor.execute(statement)
+        result = self.cursor.fetchall()
+        if result:
+            return Category(*result[0])
+        else:
+            raise RecordNotFoundException(f'record with id={id_groups} not found')
+
+    def insert(self, groups):
+        statement = f"INSERT INTO CATEGORY (NAME) VALUES \
+                         ('{groups.name}')"
+        self.cursor.execute(statement)
+        try:
+            self.connection.commit()
+        except Exception as e:
+            raise DbCommitException(e.args)
+
+    def update(self, groups):
+        statement = f"UPDATE CATEGORY SET NAME='{groups.name}' \
+                         WHERE ID='{groups.id_groups}'"
+        self.cursor.execute(statement)
+        try:
+            self.connection.commit()
+        except Exception as e:
+            raise DbUpdateException(e.args)
+
+    def delete(self, groups):
+        statement = f"DELETE FROM CATEGORY WHERE ID='{groups.id_groups}'"
+        self.cursor.execute(statement)
+        try:
+            self.connection.commit()
+        except Exception as e:
+            raise DbDeleteException(e.args)
+
+
 class MapperRegistry:
     mappers = {
-        'sportsman': SportsmanMapper
+        'sportsman': SportsmanMapper,
+        'category': CategoryMapper,
+        'group': GroupMapper
     }
 
     @staticmethod
     def get_mapper(obj):
         if isinstance(obj, Sportsman):
             return SportsmanMapper(connection)
+        if isinstance(obj, Category):
+            return CategoryMapper(connection)
+        if isinstance(obj, Group):
+            return GroupMapper(connection)
 
     @staticmethod
     def get_current_mapper(name):

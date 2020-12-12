@@ -32,25 +32,25 @@ class UserFactory:
         return cls.types[type_](firstname, lastname)
 
 
-class Category:
+class Category(DomainObject):
     # реестр?
-    auto_id = 0
+    # auto_id = 0
 
-    def __getitem__(self, item):
-        return self.groups[item]
+    # def __getitem__(self, item):
+    #     return self.groups[item]
 
-    def __init__(self, name, category):
-        self.id = Category.auto_id
-        Category.auto_id += 1
+    def __init__(self, name):
+        # self.id = Category.auto_id
+        # Category.auto_id += 1
         self.name = name
-        self.category = category
-        self.groups = []
+        # self.category = category
+        # self.groups = []
 
-    def group_count(self):
-        result = len(self.groups)
-        if self.category:
-            result += self.category.group_count()
-        return result
+    # def group_count(self):
+    #     result = len(self.groups)
+    #     if self.category:
+    #         result += self.category.group_count()
+    #     return result
 
 
 class Group(PrototypeMixin, Subject):
@@ -70,16 +70,22 @@ class Group(PrototypeMixin, Subject):
         self.notify()
 
 
-class StartGroup(Group):
-    pass
+class StartGroup(Group, DomainObject):
+    def __init__(self, name):
+        self.name = 'Start Group'
+        super().__init__(name)
 
 
-class MediumGroup(Group):
-    pass
+class MediumGroup(Group, DomainObject):
+    def __init__(self, name):
+        self.name = 'Medium Group'
+        super().__init__(name)
 
 
-class ProGroup(Group):
-    pass
+class ProGroup(Group, DomainObject):
+    def __init__(self, name):
+        self.name = 'Pro Group'
+        super().__init__(name)
 
 
 class GroupFactory:
@@ -90,8 +96,8 @@ class GroupFactory:
     }
 
     @classmethod
-    def create(cls, type_, name, category):
-        return cls.types[type_](name, category)
+    def create(cls, type_, category):
+        return cls.types[type_](category)
 
 
 class SmsNotifier(Observer):
@@ -129,8 +135,8 @@ class TrainingPage:
     def create_user(self, type_, firstname, lastname):
         return UserFactory.create(type_, firstname, lastname)
 
-    def create_category(self, name, category=None):
-        return Category(name, category)
+    def create_category(self, name):
+        return Category(name)
 
     def find_category_by_id(self, id):
         for item in self.categories:
@@ -146,16 +152,15 @@ class TrainingPage:
     #             return item
     #     return self.create_category(name)
 
-    def create_group(self, type_, name, category):
-        return GroupFactory.create(type_, name, category)
+    def create_group(self, type_, category):
+        return GroupFactory.create(type_, category)
 
     def get_group(self, name) -> Group:
         for item in self.groups:
             if item.name == name:
                 return item
 
-
-    def get_student(self, name) -> Sportsman:
-        for item in self.sportsman:
-            if item.name == name:
-                return item
+    # def get_student(self, name) -> Sportsman:
+    #     for item in self.sportsman:
+    #         if item.name == name:
+    #             return item
