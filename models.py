@@ -60,7 +60,6 @@ class Group(PrototypeMixin, Subject, DomainObject):
         # self.category.groups.append(self)
         # self.sportsman = []
         super().__init__()
-    #
     # def __getitem__(self, item):
     #     return self.sportsman[item]
     #
@@ -69,23 +68,20 @@ class Group(PrototypeMixin, Subject, DomainObject):
     #     sportsman.groups.append(self)
     #     self.notify()
 
-
 class StartGroup(Group):
     def __init__(self, name):
         self.name = 'Start Group'
-        super().__init__(name)
+
 
 
 class MediumGroup(Group):
     def __init__(self, name):
         self.name = 'Medium Group'
-        super().__init__(name)
 
 
 class ProGroup(Group):
     def __init__(self, name):
         self.name = 'Pro Group'
-        super().__init__(name)
 
 
 class GroupFactory:
@@ -94,9 +90,8 @@ class GroupFactory:
         'medium': MediumGroup,
         'pro': ProGroup
     }
-
     @classmethod
-    def create(cls, type_):
+    def create(cls, type_):  # пердположим прилетело type_ = 'start'
         return cls.types[type_](type_)
 
 
