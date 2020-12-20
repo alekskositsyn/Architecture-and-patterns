@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Список категорий{% endblock %}
+{% block container %}
+    <h1>Список категорий</h1>
+    <ul>
+        {% for item in objects_list %}
+            <li>
+{#                {{ item.name }} {{ item }}<span>Количество групп: {{ item.group_count() }}</span>#}
+                {{ item.name }}
+
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
