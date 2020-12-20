@@ -52,6 +52,14 @@ class GroupCreateView(CreateView):
         UnitOfWork.get_current().commit()
 
 
+class GroupListView(ListView):
+    template_name = 'group_list.html'
+
+    def get_queryset(self):
+        mapper = MapperRegistry.get_current_mapper('group')
+        return mapper.all()
+
+
 # @debug
 # def create_group(request):
 #     if request['method'] == 'POST':
@@ -161,8 +169,12 @@ class AddSportsmanByGroupCreateView(CreateView):
         group_name = data['group_name']
         group = site.get_group(group_name)
         sportsman_name = data['sportsman_name']
-        sportsman = site.get_student(sportsman_name)
-        group.add_sportsman(sportsman)
+        sportsman = site.sportsman(sportsman_name)
+        group.sportsman(sportsman)
+
+    def get_queryset(self):
+        mapper = MapperRegistry.get_current_mapper('sportsman')
+        return mapper.all()
 
 
 # @debug
@@ -192,6 +204,7 @@ class AddSportsmanByGroupCreateView(CreateView):
 urls = {
     '/': index,
     '/create-group/': GroupCreateView(),
+    '/group-list/': GroupListView(),
     '/create-category/': CategoryCreateView(),
     '/category-list/': CategoryListView(),
     '/sportsman-list/': SportsmanListView(),
@@ -229,11 +242,11 @@ def copy_course(request):
 #     return '200 OK', templates_engine('category_list.html', objects_list=site.categories)
 #
 #
-@application.add_urls('/group-list/')
-@debug
-def group_list(request):
-    logger.log('List groups')
-    return '200 OK', templates_engine('group_list.html', objects_list=site.categories)
+# @application.add_urls('/group-list/')
+# @debug
+# def group_list(request):
+#     logger.log('List groups')
+#     return '200 OK', templates_engine('group_list.html', objects_list=site.categories)
 
 
 @application.add_urls('/api/')
